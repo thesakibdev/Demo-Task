@@ -25,7 +25,7 @@ export default function HeadlineEditor() {
 
   const [copied, setCopied] = useState(false);
   const [copiedHTML, setCopiedHTML] = useState(false);
-  const [copiedReact, setCopiedReact] = useState(false);
+  // const [copiedReact, setCopiedReact] = useState(false);
 
   const generateCSS = () => {
     const styles = {
@@ -124,34 +124,34 @@ export default function HeadlineEditor() {
     return `<h1 class="${classes.join(" ")}">${text}</h1>`;
   };
 
-  const generateReactHTML = () => {
-    const styleObj = {
-      fontFamily: `'${fontFamily}'`,
-      fontSize: `'${fontSize}px'`,
-      fontWeight: fontWeight,
-      lineHeight: lineHeight,
-      letterSpacing: `'${letterSpacing}px'`,
-      ...(shadow !== "none" && { textShadow: `'${shadow}'` }),
-      ...(gradient.enabled && {
-        background: `'linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})'`,
-        WebkitBackgroundClip: "'text'",
-        WebkitTextFillColor: "'transparent'",
-        backgroundClip: "'text'",
-      }),
-    };
+  // const generateReactHTML = () => {
+  //   const styleObj = {
+  //     fontFamily: `'${fontFamily}'`,
+  //     fontSize: `'${fontSize}px'`,
+  //     fontWeight: fontWeight,
+  //     lineHeight: lineHeight,
+  //     letterSpacing: `'${letterSpacing}px'`,
+  //     ...(shadow !== "none" && { textShadow: `'${shadow}'` }),
+  //     ...(gradient.enabled && {
+  //       background: `'linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})'`,
+  //       WebkitBackgroundClip: "'text'",
+  //       WebkitTextFillColor: "'transparent'",
+  //       backgroundClip: "'text'",
+  //     }),
+  //   };
 
-    const styleString = Object.entries(styleObj)
-      .map(([key, value]) => `    ${key}: ${value}`)
-      .join(",\n");
+  //   const styleString = Object.entries(styleObj)
+  //     .map(([key, value]) => `    ${key}: ${value}`)
+  //     .join(",\n");
 
-    return `<h1 
-    style={{
-  ${styleString}
-    }}
-  >
-    ${text}
-  </h1>`;
-  };
+  //   return `<h1 
+  //   style={{
+  // ${styleString}
+  //   }}
+  // >
+  //   ${text}
+  // </h1>`;
+  // };
 
   const copyCSS = async () => {
     const css = `.headline {\n${generateCSS()}\n}`;
@@ -174,15 +174,15 @@ export default function HeadlineEditor() {
     }
   };
 
-  const copyReact = async () => {
-    try {
-      await navigator.clipboard.writeText(generateReactHTML());
-      setCopiedReact(true);
-      setTimeout(() => setCopiedReact(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy React HTML:", err);
-    }
-  };
+  // const copyReact = async () => {
+  //   try {
+  //     await navigator.clipboard.writeText(generateReactHTML());
+  //     setCopiedReact(true);
+  //     setTimeout(() => setCopiedReact(false), 2000);
+  //   } catch (err) {
+  //     console.error("Failed to copy React HTML:", err);
+  //   }
+  // };
 
   const headlineStyle = {
     fontFamily: fontFamily,
@@ -491,7 +491,7 @@ export default function HeadlineEditor() {
                 <code>{generateTailwindHTML()}</code>
               </pre>
             </div>
-            <div className="">
+            {/* <div className="">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">React</h3>
                 <button
@@ -504,7 +504,7 @@ export default function HeadlineEditor() {
               <pre className="text-blue-400 text-sm overflow-x-auto">
                 <code>{generateReactHTML()}</code>
               </pre>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
