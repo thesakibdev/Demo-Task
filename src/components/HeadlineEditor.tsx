@@ -121,7 +121,7 @@ export default function HeadlineEditor() {
       classes.push(`drop-shadow-[${shadow}]`);
     }
 
-    return `<h1 class="${classes.join(" ")}">${text}</h1>`;
+    return `<h1 className="${classes.join(" ")}">${text}</h1>`;
   };
 
   const copyCSS = async () => {
