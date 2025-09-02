@@ -38,7 +38,11 @@ interface HeadlineSettings {
   theme: "light" | "dark";
 }
 
-
-export type { GradientDir, ShadowPreset, LetterEffect, SegmentStyle, Segment };
-
-export default HeadlineSettings;
+export type {
+  GradientDir,
+  ShadowPreset,
+  LetterEffect,
+  SegmentStyle,
+  Segment,
+  HeadlineSettings,
+};
