@@ -9,11 +9,6 @@ const Header = () => {
             <p className="text-sm">Edit your headline with ease</p>
           </div>
         </div>
-        <div className="">
-          <p className="text-sm font-semibold">
-            Press Cmd/Ctrl + K to open the editor
-          </p>
-        </div>
       </div>
     </header>
   );

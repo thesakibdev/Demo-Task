@@ -10,6 +10,7 @@ export default function HeadlineEditor() {
     lineHeight,
     letterSpacing,
     fontFamily,
+    textColor,
     gradient,
     shadow,
     setText,
@@ -18,14 +19,17 @@ export default function HeadlineEditor() {
     setLineHeight,
     setLetterSpacing,
     setFontFamily,
+    setTextColor,
     toggleGradient,
     setGradientColors,
+    setGradientDirection,
     setShadow,
   } = useEditorStore();
 
   const [copied, setCopied] = useState(false);
   const [copiedHTML, setCopiedHTML] = useState(false);
-  // const [copiedReact, setCopiedReact] = useState(false);
+
+  // remove local gradient mirror; update store directly to avoid desync
 
   const generateCSS = () => {
     const styles = {
@@ -35,6 +39,7 @@ export default function HeadlineEditor() {
       lineHeight: lineHeight,
       letterSpacing: `${letterSpacing}px`,
       textShadow: shadow !== "none" ? shadow : undefined,
+      color: !gradient.enabled ? textColor : undefined,
       background: gradient.enabled
         ? `linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})`
         : undefined,
@@ -58,7 +63,6 @@ export default function HeadlineEditor() {
   const generateTailwindHTML = () => {
     const classes = [];
 
-    // Font family
     const fontMap: Record<string, string> = {
       Inter: "font-sans",
       Roboto: "font-sans",
@@ -71,10 +75,8 @@ export default function HeadlineEditor() {
     };
     classes.push(fontMap[fontFamily] || `font-['${fontFamily}']`);
 
-    // Font size - using arbitrary values for exact match
     classes.push(`text-[${fontSize}px]`);
 
-    // Font weight
     const weightMap: Record<number, string> = {
       100: "font-thin",
       200: "font-extralight",
@@ -88,15 +90,12 @@ export default function HeadlineEditor() {
     };
     classes.push(weightMap[fontWeight] || `font-[${fontWeight}]`);
 
-    // Line height - using arbitrary values
     classes.push(`leading-[${lineHeight}]`);
 
-    // Letter spacing - using arbitrary values
     if (letterSpacing !== 0) {
       classes.push(`tracking-[${letterSpacing}px]`);
     }
 
-    // Gradient
     if (gradient.enabled) {
       const direction = gradient.direction.replace("to ", "");
       const dirMap: Record<string, string> = {
@@ -114,44 +113,16 @@ export default function HeadlineEditor() {
       classes.push("text-transparent");
       classes.push(`from-[${gradient.colors[0]}]`);
       classes.push(`to-[${gradient.colors[1]}]`);
+    } else {
+      classes.push(`text-[${textColor}]`);
     }
 
-    // Text shadow using arbitrary values
     if (shadow !== "none") {
       classes.push(`drop-shadow-[${shadow}]`);
     }
 
     return `<h1 class="${classes.join(" ")}">${text}</h1>`;
   };
-
-  // const generateReactHTML = () => {
-  //   const styleObj = {
-  //     fontFamily: `'${fontFamily}'`,
-  //     fontSize: `'${fontSize}px'`,
-  //     fontWeight: fontWeight,
-  //     lineHeight: lineHeight,
-  //     letterSpacing: `'${letterSpacing}px'`,
-  //     ...(shadow !== "none" && { textShadow: `'${shadow}'` }),
-  //     ...(gradient.enabled && {
-  //       background: `'linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})'`,
-  //       WebkitBackgroundClip: "'text'",
-  //       WebkitTextFillColor: "'transparent'",
-  //       backgroundClip: "'text'",
-  //     }),
-  //   };
-
-  //   const styleString = Object.entries(styleObj)
-  //     .map(([key, value]) => `    ${key}: ${value}`)
-  //     .join(",\n");
-
-  //   return `<h1 
-  //   style={{
-  // ${styleString}
-  //   }}
-  // >
-  //   ${text}
-  // </h1>`;
-  // };
 
   const copyCSS = async () => {
     const css = `.headline {\n${generateCSS()}\n}`;
@@ -174,70 +145,68 @@ export default function HeadlineEditor() {
     }
   };
 
-  // const copyReact = async () => {
-  //   try {
-  //     await navigator.clipboard.writeText(generateReactHTML());
-  //     setCopiedReact(true);
-  //     setTimeout(() => setCopiedReact(false), 2000);
-  //   } catch (err) {
-  //     console.error("Failed to copy React HTML:", err);
-  //   }
+  // const headlineStyle = {
+  //   fontFamily: fontFamily,
+  //   fontSize: `${fontSize}px`,
+  //   fontWeight: fontWeight,
+  //   lineHeight: lineHeight,
+  //   letterSpacing: `${letterSpacing}px`,
+  //   textShadow: shadow !== "none" ? shadow : undefined,
+  //   ...(gradient.enabled
+  //     ? {
+  //         background: `linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})`,
+  //         WebkitBackgroundClip: "text",
+  //         WebkitTextFillColor: "transparent",
+  //         backgroundClip: "text",
+  //         color: "transparent",
+  //       }
+  //     : {
+  //         color: textColor,
+  //       }),
   // };
-
-  const headlineStyle = {
-    fontFamily: fontFamily,
-    fontSize: `${fontSize}px`,
-    fontWeight: fontWeight,
-    lineHeight: lineHeight,
-    letterSpacing: `${letterSpacing}px`,
-    textShadow: shadow !== "none" ? shadow : undefined,
-    ...(gradient.enabled
-      ? {
-          background: `linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          color: "transparent",
-        }
-      : {
-          background: "none",
-          WebkitBackgroundClip: "unset",
-          WebkitTextFillColor: "unset",
-          backgroundClip: "unset",
-          color: "inherit",
-        }),
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="container px-4 mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Headline Typography Editor
         </h1>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Preview Section */}
+          {/* Preview */}
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-xl font-semibold text-gray-700 mb-6">
               Preview
             </h2>
             <div className="bg-gray-100 rounded-lg p-8 min-h-[200px] flex items-center justify-center">
               <h1
-                style={headlineStyle}
-                className="text-center max-w-full break-words"
+                className="text-5xl font-bold"
+                style={{
+                  background: gradient.enabled
+                    ? `linear-gradient(${gradient.direction}, ${gradient.colors[0]}, ${gradient.colors[1]})`
+                    : "none",
+                  WebkitBackgroundClip: gradient.enabled ? "text" : "unset",
+                  color: gradient.enabled ? "transparent" : "#111827",
+                  fontFamily: fontFamily,
+                  fontSize: `${fontSize}px`,
+                  fontWeight: fontWeight,
+                  lineHeight: lineHeight,
+                  letterSpacing: `${letterSpacing}px`,
+                  textShadow: shadow !== "none" ? shadow : undefined,
+                }}
               >
                 {text}
               </h1>
             </div>
           </div>
 
-          {/* Controls Section */}
+          {/* Controls */}
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-xl font-semibold text-gray-700 mb-6">
               Controls
             </h2>
 
-            {/* Text Input */}
+            {/* Headline Input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Headline Text
@@ -357,6 +326,7 @@ export default function HeadlineEditor() {
 
               {gradient.enabled && (
                 <div className="space-y-3">
+                  {/* Color Pickers */}
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">
@@ -391,9 +361,55 @@ export default function HeadlineEditor() {
                       />
                     </div>
                   </div>
+
+                  {/* Direction Dropdown */}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">
+                      Gradient Direction
+                    </label>
+                    <select
+                      value={gradient.direction}
+                      onChange={(e) => setGradientDirection(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="to right">→ To Right</option>
+                      <option value="to left">← To Left</option>
+                      <option value="to bottom">↓ To Bottom</option>
+                      <option value="to top">↑ To Top</option>
+                      <option value="to bottom right">↘ To Bottom Right</option>
+                      <option value="to bottom left">↙ To Bottom Left</option>
+                      <option value="to top right">↗ To Top Right</option>
+                      <option value="to top left">↖ To Top Left</option>
+                    </select>
+                  </div>
+                  {/* live updates; no separate save needed */}
                 </div>
               )}
             </div>
+
+            {/* Solid Text Color */}
+            {!gradient.enabled && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Text Color
+                </label>
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="h-10 w-14 rounded border border-gray-300"
+                  />
+                  <input
+                    type="text"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    placeholder="#111827"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Shadow Controls */}
             <div className="mb-6">
@@ -459,7 +475,6 @@ export default function HeadlineEditor() {
 
         {/* Code Preview */}
         <div className="mt-8 grid md:grid-cols-2 gap-6">
-          {/* CSS Preview */}
           <div className="bg-gray-900 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">CSS</h3>
@@ -475,7 +490,6 @@ export default function HeadlineEditor() {
             </pre>
           </div>
 
-          {/* HTML Preview */}
           <div className="bg-gray-900 rounded-xl p-6">
             <div className="">
               <div className="flex items-center justify-between mb-4">
@@ -491,20 +505,6 @@ export default function HeadlineEditor() {
                 <code>{generateTailwindHTML()}</code>
               </pre>
             </div>
-            {/* <div className="">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">React</h3>
-                <button
-                  onClick={copyReact}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <Copy size={18} />
-                </button>
-              </div>
-              <pre className="text-blue-400 text-sm overflow-x-auto">
-                <code>{generateReactHTML()}</code>
-              </pre>
-            </div> */}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ interface EditorState {
   fontWeight: number;
   lineHeight: number;
   letterSpacing: number;
+  textColor: string;
   gradient: Gradient;
   shadow: string;
   setText: (val: string) => void;
@@ -21,8 +22,10 @@ interface EditorState {
   setFontFamily: (val: string) => void;
   setLineHeight: (val: number) => void;
   setLetterSpacing: (val: number) => void;
+  setTextColor: (val: string) => void;
   toggleGradient: () => void;
   setGradientColors: (colors: [string, string]) => void;
+  setGradientDirection: (direction: string) => void; 
   setShadow: (val: string) => void;
 }
 
@@ -33,6 +36,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   fontWeight: 700,
   lineHeight: 1.2,
   letterSpacing: 0,
+  textColor: "#111827",
   gradient: {
     enabled: false,
     direction: "to right",
@@ -45,9 +49,13 @@ export const useEditorStore = create<EditorState>((set) => ({
   setFontFamily: (val) => set({ fontFamily: val }),
   setLineHeight: (val) => set({ lineHeight: val }),
   setLetterSpacing: (val) => set({ letterSpacing: val }),
+  setTextColor: (val) => set({ textColor: val }),
   toggleGradient: () =>
     set((s) => ({ gradient: { ...s.gradient, enabled: !s.gradient.enabled } })),
   setGradientColors: (colors) =>
     set((s) => ({ gradient: { ...s.gradient, colors } })),
+  setGradientDirection: (
+    direction 
+  ) => set((s) => ({ gradient: { ...s.gradient, direction } })),
   setShadow: (val) => set({ shadow: val }),
 }));
